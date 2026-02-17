@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>AmaUrja — Community Renewable Energy Sharing</title>
+		<meta name="description" content="AmaUrja: a community renewable energy sharing platform with real-time monitoring, AI forecasting and blockchain-secure transactions." />
+		<style>
+			:root{--bg:#f7fafc;--card:#ffffff;--primary:#0f766e;--muted:#64748b}
+			*{box-sizing:border-box}
+			body{font-family:Inter,Segoe UI,Helvetica,Arial,sans-serif;margin:0;background:var(--bg);color:#0f172a}
+			.container{max-width:1000px;margin:40px auto;padding:24px}
+			header{display:flex;align-items:center;justify-content:space-between}
+			.brand{display:flex;gap:12px;align-items:center}
+			.logo{width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#10b981,#06b6d4);display:inline-flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+			nav a{margin-left:16px;color:var(--muted);text-decoration:none;font-weight:600}
+			.hero{display:flex;gap:28px;align-items:center;margin-top:28px}
+			.hero-left{flex:1}
+			h1{margin:0;font-size:2rem;color:var(--primary)}
+			p.lead{color:var(--muted);margin:12px 0 20px}
+			.cta{display:inline-flex;gap:10px}
+			.btn{padding:12px 18px;border-radius:8px;border:0;cursor:pointer;font-weight:600}
+			.btn-primary{background:var(--primary);color:#fff}
+			.btn-ghost{background:transparent;color:var(--primary);border:1px solid rgba(15,118,110,0.12)}
+			.card{background:var(--card);border-radius:12px;padding:18px;box-shadow:0 4px 18px rgba(2,6,23,0.06)}
+			.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-top:20px}
+			.feature h3{margin:0 0 6px}
+			.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}
+			footer{margin-top:40px;padding-top:20px;border-top:1px solid #e6eef4;color:var(--muted);font-size:14px}
+			@media (max-width:720px){.hero{flex-direction:column}.logo{width:40px;height:40px}}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<header>
+				<div class="brand">
+					<div class="logo">AU</div>
+					<div>
+						<div style="font-weight:700">AmaUrja</div>
+						<div style="font-size:12px;color:var(--muted)">Community Renewable Energy Sharing</div>
+					</div>
+				</div>
+				<nav>
+					<a href="#features">Features</a>
+					<a href="#how">How it Works</a>
+					<a href="#tech">Technology</a>
+					<a href="#contact">Contact</a>
+				</nav>
+			</header>
+
+			<section class="hero">
+				<div class="hero-left">
+					<h1>Smart, local energy sharing for sustainable communities</h1>
+					<p class="lead">AmaUrja enables peer-to-peer sharing of surplus renewable energy with real-time monitoring, AI forecasting, and blockchain-secured transactions — lowering costs and reducing waste.</p>
+					<div class="cta">
+						<button class="btn btn-primary">Get Started</button>
+						<button class="btn btn-ghost">View Demo</button>
+					</div>
+				</div>
+				<div class="card" style="width:360px">
+					<h3 style="margin-top:0">At a glance</h3>
+					<p style="color:var(--muted);margin:8px 0 12px">Peer-to-peer sharing, AI demand forecasting, and blockchain transaction records — all in one community-focused platform.</p>
+					<ul style="margin:0;padding-left:18px;color:var(--muted)">
+						<li>Real-time energy monitoring</li>
+						<li>Automatic surplus redistribution</li>
+						<li>Emergency power prioritization</li>
+					</ul>
+				</div>
+			</section>
+
+			<section id="features" style="margin-top:28px">
+				<h2 style="margin:0 0 12px">Key Features</h2>
+				<div class="features">
+					<div class="card feature">
+						<h3>Peer-to-Peer Sharing</h3>
+						<p style="color:var(--muted);margin:6px 0">Efficiently route surplus solar energy to neighbors in real time.</p>
+					</div>
+					<div class="card feature">
+						<h3>AI Forecasting</h3>
+						<p style="color:var(--muted);margin:6px 0">Predict demand and generation using historical and weather data.</p>
+					</div>
+					<div class="card feature">
+						<h3>Blockchain Security</h3>
+						<p style="color:var(--muted);margin:6px 0">Tamper-proof transaction ledger for transparent energy trading.</p>
+					</div>
+					<div class="card feature">
+						<h3>Emergency Mode</h3>
+						<p style="color:var(--muted);margin:6px 0">Prioritize essential appliances during outages to keep communities safe.</p>
+					</div>
+				</div>
+			</section>
+
+			<section id="how" style="margin-top:28px">
+				<h2 style="margin:0 0 12px">How It Works</h2>
+				<div class="how">
+					<div class="card">
+						<h3>1. Monitor</h3>
+						<p style="color:var(--muted);margin:6px 0">Smart meters collect generation and consumption data in real time.</p>
+					</div>
+					<div class="card">
+						<h3>2. Match</h3>
+						<p style="color:var(--muted);margin:6px 0">Surplus energy is matched automatically with nearby demand.</p>
+					</div>
+					<div class="card">
+						<h3>3. Secure & Optimize</h3>
+						<p style="color:var(--muted);margin:6px 0">Transactions are recorded on-chain and AI optimizes distribution.</p>
+					</div>
+				</div>
+			</section>
+
+			<section id="tech" style="margin-top:28px">
+				<h2 style="margin:0 0 12px">Technology Stack</h2>
+				<div class="card" style="display:flex;flex-wrap:wrap;gap:12px">
+					<div style="min-width:220px">
+						<strong>Frontend</strong>
+						<div style="color:var(--muted)">React, React Native</div>
+					</div>
+					<div style="min-width:220px">
+						<strong>Backend</strong>
+						<div style="color:var(--muted)">Django, REST APIs, MySQL</div>
+					</div>
+					<div style="min-width:220px">
+						<strong>Data & Security</strong>
+						<div style="color:var(--muted)">Machine Learning, Blockchain, IoT Integration</div>
+					</div>
+				</div>
+			</section>
+
+			<section id="contact" style="margin-top:28px">
+				<h2 style="margin:0 0 12px">Get Involved</h2>
+				<div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+					<div style="flex:1;min-width:220px">
+						<p style="margin:0;color:var(--muted)">Join the AmaUrja development team, pilot your community project, or request a demo.</p>
+					</div>
+					<div style="display:flex;gap:10px">
+						<a href="mailto:hello@amaurja.example" class="btn btn-primary" style="text-decoration:none;display:inline-block">Contact Us</a>
+						<a href="#" class="btn btn-ghost" style="text-decoration:none;display:inline-block">Contribute</a>
+					</div>
+				</div>
+			</section>
+
+			<footer>
+				<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+					<div>© AmaUrja Development Team</div>
+					<div style="color:var(--muted)">Promoting sustainable, community-driven renewable energy</div>
+				</div>
+			</footer>
+		</div>
+	</body>
+</html>
+
