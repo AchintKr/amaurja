@@ -1,0 +1,1547 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Amaurja{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-page {
+        padding: 40px ;
+    }
+    
+    /* Header */
+    .dashboard-header {
+        margin-bottom: 40px;
+    }
+    
+    .dashboard-header h2 {
+        font-size: 2.4rem;
+        font-weight: 800;
+        color: #0D3012;
+        margin-bottom: 10px;
+    }
+    
+    .dashboard-header .role-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 22px;
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        color: white;
+        border-radius: 25px;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-bottom: 40px;
+    }
+    
+    .stat-card {
+        border-radius: 16px;
+        padding: 28px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: -25%;
+        left: -25%;
+        width: 150%;
+        height: 150%;
+        background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 60%);
+        animation: statGlow 4s ease-in-out infinite;
+    }
+    
+    @keyframes statGlow {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+    
+    .stat-card .stat-icon {
+        font-size: 3rem;
+        opacity: 0.12;
+        position: absolute;
+        right: 20px;
+        top: 20px;
+    }
+    
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #ffffff;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        margin-bottom: 6px;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .stat-card .stat-label {
+        font-size: 0.95rem;
+        color: rgba(255,255,255,0.92);
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+        margin-bottom: 40px;
+    }
+    
+    .quick-actions h4 {
+        color: #0D3012;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+    
+    .action-btn {
+        padding: 18px;
+        border-radius: 12px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: all 0.4s ease;
+        border: none;
+    }
+    
+    .action-btn i {
+        font-size: 1.2rem;
+    }
+    
+    .action-btn:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+    
+    /* Main Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    
+    @media (max-width: 992px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    /* Activity Card */
+    .activity-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .activity-card .card-header {
+        background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+        padding: 18px 24px;
+    }
+    
+    .nav-tabs .nav-link {
+        border: none;
+        padding: 14px 22px;
+        color: #5A6C6F;
+        font-weight: 600;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #1B5E20;
+        background: transparent;
+    }
+    
+    /* Table */
+    .table thead th {
+        background: #F8F9FA;
+        color: #1B5E20;
+        font-weight: 700;
+        padding: 14px 16px;
+        border: none;
+    }
+    
+    .table tbody tr:hover {
+        background: #E8F5E9;
+    }
+    
+    .table tbody td {
+        padding: 14px 16px;
+        vertical-align: middle;
+    }
+    
+    /* Sidebar Cards */
+    .sidebar-card {
+        border-radius: 16px;
+        margin-bottom: 24px;
+    }
+    
+    .sidebar-card .card-header {
+        padding: 16px 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .sidebar-card .card-header i {
+        animation: iconPulse 2s ease-in-out infinite;
+    }
+    
+    @keyframes iconPulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.15); }
+    }
+    
+    /* Items */
+    .listing-item, .transaction-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 0;
+        border-bottom: 1px solid #EEE;
+        transition: all 0.3s ease;
+    }
+    
+    .listing-item:hover, .transaction-item:hover {
+        padding-left: 10px;
+        background: #F8F9FA;
+        border-radius: 8px;
+    }
+    
+    .listing-item:last-child, .transaction-item:last-child {
+        border-bottom: none;
+    }
+    
+    /* Quick Links */
+    .quick-links .list-group-item {
+        padding: 16px 20px;
+        border: none;
+        border-bottom: 1px solid #EEE;
+        transition: all 0.3s ease;
+    }
+    
+    .quick-links .list-group-item:hover {
+        background: #E8F5E9;
+        padding-left: 28px;
+    }
+    
+    .quick-links .list-group-item i {
+        color: #4CAF50;
+        width: 20px;
+    }
+    
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 40px;
+        color: #5A6C6F;
+    }
+    
+    .empty-state i {
+        font-size: 3rem;
+        margin-bottom: 14px;
+        opacity: 0.4;
+    }
+    
+    /* Weather and Maintenance Section */
+    .weather-section {
+        margin-bottom: 30px;
+    }
+    
+    .weather-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .weather-card .card-header {
+        background: linear-gradient(135deg, #1565C0, #42A5F5);
+        color: white;
+        padding: 14px 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .weather-forecast-item {
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .weather-forecast-item:last-child {
+        border-bottom: none;
+    }
+    
+    .weather-forecast-item .day {
+        width: 80px;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .weather-forecast-item .temp {
+        flex: 1;
+        color: #666;
+    }
+    
+    .weather-forecast-item .temp span {
+        color: #E65100;
+        font-weight: 600;
+    }
+    
+    /* Maintenance Suggestions */
+    .maintenance-section {
+        margin-bottom: 30px;
+    }
+    
+    .maintenance-card {
+        border-radius: 16px;
+        overflow: hidden;
+    }
+    
+    .suggestion-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 14px;
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+    
+    .suggestion-item:last-child {
+        border-bottom: none;
+    }
+    
+    .suggestion-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .suggestion-item .suggestion-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+    
+    .suggestion-item .suggestion-icon.critical {
+        background: rgba(244, 67, 54, 0.1);
+        color: #f44336;
+    }
+    
+    .suggestion-item .suggestion-icon.warning {
+        background: rgba(255, 152, 0, 0.1);
+        color: #ff9800;
+    }
+    
+    .suggestion-item .suggestion-icon.info {
+        background: rgba(33, 150, 243, 0.1);
+        color: #2196F3;
+    }
+    
+    .suggestion-item .suggestion-content {
+        flex: 1;
+    }
+    
+    .suggestion-item .suggestion-title {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+    
+    .suggestion-item .suggestion-message {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    /* Panel Status */
+    .panel-status {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .panel-status-item {
+        flex: 1;
+        padding: 15px;
+        border-radius: 10px;
+        text-align: center;
+    }
+    
+    .panel-status-item.age {
+        background: linear-gradient(135deg, #5D4037, #8D6E63);
+        color: white;
+    }
+    
+    .panel-status-item.efficiency {
+        background: linear-gradient(135deg, #2E7D32, #66BB6A);
+        color: white;
+    }
+    
+    .panel-status-item.maintenance {
+        background: linear-gradient(135deg, #F57C00, #FFB74D);
+        color: white;
+    }
+    
+    .panel-status-item.warning {
+        background: linear-gradient(135deg, #C62828, #EF5350);
+        color: white;
+    }
+    
+    .panel-status-item .value {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+    
+.panel-status-item .label {
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+    
+    /* Buy Recommendations Section */
+    .buy-recommendations-section {
+        margin-bottom: 30px;
+    }
+    
+    .recommendation-card {
+        border-radius: 16px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .recommendation-card:hover {
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .recommendation-card .card-header {
+        padding: 14px 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .recommendation-card .card-header i {
+        animation: iconPulse 2s ease-in-out infinite;
+    }
+    
+    .seller-card {
+        display: flex;
+        align-items: center;
+        padding: 16px;
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+    
+    .seller-card:last-child {
+        border-bottom: none;
+    }
+    
+    .seller-card:hover {
+        background: #f8f9fa;
+    }
+    
+    .seller-card .seller-rank {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-right: 12px;
+        flex-shrink: 0;
+    }
+    
+    .seller-card .seller-rank.gold {
+        background: linear-gradient(135deg, #FFD700, #FFA500);
+        color: white;
+    }
+    
+    .seller-card .seller-rank.silver {
+        background: linear-gradient(135deg, #C0C0C0, #A0A0A0);
+        color: white;
+    }
+    
+    .seller-card .seller-rank.bronze {
+        background: linear-gradient(135deg, #CD7F32, #8B4513);
+        color: white;
+    }
+    
+    .seller-card .seller-rank.default {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        color: white;
+    }
+    
+    .seller-card .seller-info {
+        flex: 1;
+    }
+    
+    .seller-card .seller-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+    
+    .seller-card .seller-details {
+        font-size: 0.85rem;
+        color: #666;
+    }
+    
+    .seller-card .seller-location {
+        font-size: 0.8rem;
+        color: #888;
+    }
+    
+    .seller-card .seller-price {
+        text-align: right;
+        margin-left: 12px;
+    }
+    
+    .seller-card .price-per-kwh {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1B5E20;
+    }
+    
+    .seller-card .available-energy {
+        font-size: 0.8rem;
+        color: #666;
+    }
+
+    .seller-distance {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px !important;
+        border-radius: 999px;
+        border: 1px solid rgba(13,48,18,0.18);
+        font-weight: 800;
+        color: #1B5E20 !important;
+        background: rgba(248,249,250,0.95) !important;
+        text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+        letter-spacing: 0.2px;
+        white-space: nowrap;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .seller-distance::before {
+        content: "~";
+        font-weight: 900;
+        color: rgba(27,94,32,0.85);
+    }
+
+    .no-location-msg {
+        padding: 30px;
+        text-align: center;
+        color: #666;
+    }
+    
+    .no-location-msg i {
+        font-size: 2.5rem;
+        color: #ccc;
+        margin-bottom: 12px;
+    }
+    
+    .no-location-msg a {
+        color: #1B5E20;
+        font-weight: 600;
+    }
+    
+    .market-info {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .market-info-item {
+        padding: 12px 16px;
+        border-radius: 10px;
+        flex: 1;
+        text-align: center;
+    }
+    
+    .market-info-item.sellers {
+        background: linear-gradient(135deg, #1565C0, #1976D2);
+        color: white;
+    }
+    
+    .market-info-item.avg-price {
+        background: linear-gradient(135deg, #1B5E20, #4CAF50);
+        color: white;
+    }
+    
+    .market-info-item .value {
+        font-size: 1.3rem;
+        font-weight: 700;
+    }
+    
+    .market-info-item .label {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+   /* ==============================
+   PAGE & BACKGROUND (always)
+============================== */
+body {
+    background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+}
+
+{% if user.is_authenticated %}
+
+/* Subtle floating radial BG */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 15% 25%, rgba(34,164,74,0.10), transparent 45%),
+        radial-gradient(circle at 80% 70%, rgba(33,150,243,0.07), transparent 45%);
+    animation: floatBG 20s ease-in-out infinite alternate;
+    z-index: -1;
+    pointer-events: none;
+}
+@keyframes floatBG {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(-40px, -40px); }
+}
+
+/* ==============================
+   PAGE ENTRY (whole dashboard fades in on load)
+============================== */
+.dashboard-page {
+    animation: pageReveal 0.55s ease forwards;
+}
+@keyframes pageReveal {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* ==============================
+   HEADER DROP-IN
+============================== */
+.dashboard-header {
+    animation: headerDrop 0.7s cubic-bezier(0.34, 1.45, 0.64, 1) forwards;
+}
+@keyframes headerDrop {
+    from { opacity: 0; transform: translateY(-28px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ==============================
+   STAT CARDS — staggered pop-in + per-card glow pulse + shimmer sweep
+============================== */
+
+/* Pop-in */
+@keyframes statPop {
+    0%   { opacity: 0; transform: translateY(40px) scale(0.88); }
+    70%  { transform: translateY(-5px) scale(1.04); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Per-card glow pulses */
+@keyframes glowGreen {
+    0%,100% { box-shadow: 0 8px 24px rgba(27,94,32,0.35), 0 0 0 0 rgba(34,164,74,0.45); }
+    50%      { box-shadow: 0 14px 44px rgba(27,94,32,0.55), 0 0 32px 10px rgba(34,164,74,0.22); }
+}
+@keyframes glowBlue {
+    0%,100% { box-shadow: 0 8px 24px rgba(21,101,192,0.35), 0 0 0 0 rgba(33,150,243,0.45); }
+    50%      { box-shadow: 0 14px 44px rgba(21,101,192,0.55), 0 0 32px 10px rgba(33,150,243,0.22); }
+}
+@keyframes glowOrange {
+    0%,100% { box-shadow: 0 8px 24px rgba(230,81,0,0.35), 0 0 0 0 rgba(255,152,0,0.45); }
+    50%      { box-shadow: 0 14px 44px rgba(230,81,0,0.55), 0 0 32px 10px rgba(255,152,0,0.22); }
+}
+@keyframes glowRed {
+    0%,100% { box-shadow: 0 8px 24px rgba(198,40,40,0.35), 0 0 0 0 rgba(239,83,80,0.45); }
+    50%      { box-shadow: 0 14px 44px rgba(198,40,40,0.55), 0 0 32px 10px rgba(239,83,80,0.22); }
+}
+
+/* Shimmer sweep across card */
+@keyframes shimmerSweep {
+    0%   { transform: translateX(-130%) skewX(-15deg); }
+    100% { transform: translateX(230%) skewX(-15deg); }
+}
+
+/* Apply to stat cards */
+.stat-card {
+    opacity: 0;
+    border-radius: 18px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+/* Shimmer pseudo-element */
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 45%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+    animation: shimmerSweep 4.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+/* Stagger each card's pop-in + assign glow colour by data-stat attribute */
+.stat-card[data-stat="wallet"] {
+    animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.20s forwards,
+               glowGreen 3.5s 0.85s ease-in-out infinite;
+}
+.stat-card[data-stat="wallet"]::after   { animation-delay: 0.5s; }
+
+.stat-card[data-stat="production"] {
+    animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.35s forwards,
+               glowBlue 3.5s 1.0s ease-in-out infinite;
+}
+.stat-card[data-stat="production"]::after { animation-delay: 1.2s; }
+
+.stat-card[data-stat="consumption"] {
+    animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.50s forwards,
+               glowOrange 3.5s 1.15s ease-in-out infinite;
+}
+.stat-card[data-stat="consumption"]::after { animation-delay: 1.9s; }
+
+.stat-card[data-stat="net"] {
+    animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.65s forwards,
+               glowGreen 3.5s 1.30s ease-in-out infinite;
+}
+/* net-negative override */
+.stat-card[data-stat="net"].net-negative {
+    animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.65s forwards,
+               glowRed 3.5s 1.30s ease-in-out infinite;
+}
+.stat-card[data-stat="net"]::after { animation-delay: 2.6s; }
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.03);
+}
+
+/* ==============================
+   QUICK ACTION BUTTONS — staggered reveal + shine on hover
+============================== */
+@keyframes btnReveal {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.action-btn {
+    opacity: 0;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+/* Stagger by child index */
+.quick-actions .row .col-md-4:nth-child(1) .action-btn { animation: btnReveal 0.5s ease 0.80s forwards; }
+.quick-actions .row .col-md-4:nth-child(2) .action-btn { animation: btnReveal 0.5s ease 0.90s forwards; }
+.quick-actions .row .col-md-4:nth-child(3) .action-btn { animation: btnReveal 0.5s ease 1.00s forwards; }
+.quick-actions .row .col-md-4:nth-child(4) .action-btn { animation: btnReveal 0.5s ease 1.10s forwards; }
+.quick-actions .row .col-md-4:nth-child(5) .action-btn { animation: btnReveal 0.5s ease 1.20s forwards; }
+.quick-actions .row .col-md-4:nth-child(6) .action-btn { animation: btnReveal 0.5s ease 1.30s forwards; }
+
+/* Shine sweep on hover */
+.action-btn::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 55%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+    transition: left 0.5s ease;
+}
+.action-btn:hover::after  { left: 160%; }
+.action-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(0,0,0,0.22);
+}
+
+/* ==============================
+   CONTENT CARDS — rise up after stats settle
+============================== */
+@keyframes cardRise {
+    from { opacity: 0; transform: translateY(36px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    backdrop-filter: blur(8px);
+    background: rgba(255,255,255,0.96);
+    border-radius: 18px;
+    border: 1px solid rgba(34,164,74,0.12);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+    transition: transform 0.35s ease, box-shadow 0.35s ease;
+    animation: cardRise 0.6s ease 1.0s both;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.13);
+}
+
+/* stat-card already has its own animation — don't double-apply cardRise */
+.stat-card {
+    animation: none !important; /* handled above per data-stat */
+}
+.stat-card[data-stat="wallet"]     { animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.20s forwards, glowGreen  3.5s 0.85s ease-in-out infinite !important; }
+.stat-card[data-stat="production"] { animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.35s forwards, glowBlue   3.5s 1.00s ease-in-out infinite !important; }
+.stat-card[data-stat="consumption"]{ animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.50s forwards, glowOrange 3.5s 1.15s ease-in-out infinite !important; }
+.stat-card[data-stat="net"]        { animation: statPop 0.65s cubic-bezier(0.34,1.45,0.64,1) 0.65s forwards, glowGreen  3.5s 1.30s ease-in-out infinite !important; }
+
+/* ==============================
+   SIDEBAR & MISC CARD STAGGER
+============================== */
+.sidebar-card:nth-of-type(1) { animation-delay: 1.1s; }
+.sidebar-card:nth-of-type(2) { animation-delay: 1.25s; }
+.sidebar-card:nth-of-type(3) { animation-delay: 1.40s; }
+
+/* Seller hover slide */
+.seller-card:hover     { transform: translateX(8px); }
+/* Panel item hover */
+.panel-status-item:hover { transform: scale(1.05); transition: transform 0.25s; }
+
+/* Table row highlight */
+.table tbody tr {
+    transition: background 0.2s, transform 0.2s;
+}
+.table tbody tr:hover {
+    background: #E8F5E9;
+    transform: scale(1.006);
+}
+{% endif %}
+
+</style>
+{% comment %} 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const items = document.querySelectorAll(".fade-in");
+
+    items.forEach((el, i) => {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(30px)";
+        
+        setTimeout(() => {
+            el.style.transition = "all 0.6s ease";
+            el.style.opacity = "1";
+            el.style.transform = "translateY(0)";
+        }, i * 150);
+    });
+});
+</script> {% endcomment %}
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-page">
+    <div class="container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <h2 class="fade-in">Welcome back, {{ user.username }} 👋</h2>
+            <span class="role-badge">
+                <i class="fas fa-user-tag"></i>{{ user.get_role_display }}
+            </span>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="dashboard-stats">
+            {% comment %} <div id="virtual-meter-debug" style="grid-column: 1 / -1; padding: 10px 12px; border-radius: 12px; background: rgba(0,0,0,0.06); color: #0D3012; font-weight: 600; margin-bottom: 10px; display: block;">Virtual meter idle</div> {% endcomment %}
+
+            <!-- Live Virtual Meter Visual -->
+            <div class="card" style="grid-column: 1 / -1; border-radius: 16px; padding: 18px 18px;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <div>
+                        <div style="font-weight:800; color:#0D3012;">Live Virtual Meter</div>
+                        <div style="color:#5A6C6F; font-size:0.9rem;">Production vs Consumption updates every 5 seconds (meter advances 15 minutes per tick)</div>
+
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="text-center" style="min-width:140px;">
+                            <div style="font-size:0.85rem; color:#5A6C6F; font-weight:700;">Production (kWh)</div>
+                            <div id="vm-prod-live" style="font-size:1.4rem; font-weight:900; color:#1B5E20;">{{ 0|floatformat:2 }}</div>
+                        </div>
+                        <div class="text-center" style="min-width:140px;">
+                            <div style="font-size:0.85rem; color:#5A6C6F; font-weight:700;">Consumption (kWh)</div>
+                            <div id="vm-cons-live" style="font-size:1.4rem; font-weight:900; color:#E65100;">{{ 0|floatformat:2 }}</div>
+                        </div>
+                        <div class="text-center" style="min-width:140px;">
+                            <div style="font-size:0.85rem; color:#5A6C6F; font-weight:700;">Net (kWh)</div>
+                            <div id="vm-net-live" style="font-size:1.4rem; font-weight:900; color:#1B5E20;">{{ 0|floatformat:2 }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div style="display:flex; gap:12px; align-items:flex-end; height:66px;">
+                        <div style="flex:1; background:rgba(27,94,32,0.10); border:1px solid rgba(27,94,32,0.15); border-radius:12px; padding:10px; position:relative; overflow:hidden;">
+                            <div id="vm-prod-bar" style="position:absolute; left:10px; right:10px; bottom:10px; height:10%; background:linear-gradient(180deg,#2E7D32,#66BB6A); border-radius:10px; box-shadow:0 8px 20px rgba(46,125,50,0.25); transition:height 0.3s ease; z-index:1;"></div>
+                            <div style="position:relative; z-index:2; font-weight:800; font-size:0.75rem; color:#0D3012;">PROD</div>
+                        </div>
+                        <div style="flex:1; background:rgba(230,81,0,0.10); border:1px solid rgba(230,81,0,0.15); border-radius:12px; padding:10px; position:relative; overflow:hidden;">
+                            <div id="vm-cons-bar" style="position:absolute; left:10px; right:10px; bottom:10px; height:10%; background:linear-gradient(180deg,#F57C00,#FFC107); border-radius:10px; box-shadow:0 8px 20px rgba(245,124,0,0.25); transition:height 0.3s ease; z-index:1;"></div>
+                            <div style="position:relative; z-index:2; font-weight:800; font-size:0.75rem; color:#E65100;">CONS</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:8px; color:#7A8C86; font-size:0.82rem;" id="vm-timestamp-live">—</div>
+                </div>
+            </div>
+
+            <!-- Wallet -->
+
+            <div class="card stat-card {% if net_energy < 0 %}net-negative{% endif %}" style="background: linear-gradient(135deg, {% if net_energy >= 0 %}#1B5E20, #2E7D32{% else %}#C62828, #D32F2F{% endif %});" data-stat="net">
+                <i class="fas fa-wallet stat-icon text-white"></i>
+                <div class="stat-value" id="dashboard-wallet">₹{{ wallet.balance|floatformat:2 }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-wallet me-2"></i>Wallet Balance
+                </div>
+            </div>
+
+            <!-- Total Production -->
+            <div class="card stat-card" style="background: linear-gradient(135deg, #1565C0, #1976D2);" data-stat="production">
+                <i class="fas fa-solar-panel stat-icon text-white"></i>
+                <div class="stat-value" id="dashboard-production">{{ total_production|floatformat:2 }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-bolt me-2"></i>kWh Produced
+                </div>
+                {% if total_production == 0 %}<small class="text-white-50 d-block">No data? Refresh or simulate</small>{% endif %}
+            </div>
+
+            <!-- Total Consumption -->
+            <div class="card stat-card" style="background: linear-gradient(135deg, #E65100, #F57C00);" data-stat="consumption">
+                <i class="fas fa-bolt stat-icon text-white"></i>
+                <div class="stat-value" id="dashboard-consumption">{{ total_consumption|floatformat:2 }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-plug me-2"></i>kWh Consumed
+                </div>
+                {% if total_consumption == 0 %}<small class="text-white-50 d-block">No data? Refresh or simulate</small>{% endif %}
+            </div>
+
+            <!-- Net Energy -->
+            <div class="card stat-card" style="background: linear-gradient(135deg, {% if net_energy >= 0 %}#1B5E20, #2E7D32{% else %}#C62828, #D32F2F{% endif %});" data-stat="net">
+                <i class="fas fa-chart-line stat-icon text-white"></i>
+                <div class="stat-value" id="dashboard-net">{{ net_energy|floatformat:2 }}</div>
+                <div class="stat-label">
+                    <i class="fas fa-exchange-alt me-2"></i>Net Energy (kWh)
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+<div class="quick-actions">
+    <div class="row g-3">
+
+        {# --- BUY ENERGY: consumers + prosumers only, NOT producers --- #}
+        {% if user.role == 'consumer' or user.role == 'prosumer' %}
+        <div class="col-md-4">
+            <a href="{% url 'energy_marketplace' %}" class="btn btn-success action-btn w-100">
+                <i class="fas fa-shopping-cart"></i> Buy Energy
+            </a>
+        </div>
+        {% endif %}
+
+        {# --- SELL + ADD PRODUCTION: producers + prosumers only, NOT consumers --- #}
+        {% if user.role == 'producer' or user.role == 'prosumer' %}
+        <div class="col-md-4">
+            <a href="{% url 'create_listing' %}" class="btn btn-primary action-btn w-100">
+                <i class="fas fa-plus-circle"></i> Sell Energy
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'add_production' %}" class="btn action-btn w-100" style="background: linear-gradient(135deg, #0097A7, #00BCD4); color: white;">
+                <i class="fas fa-upload"></i> Add Production
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'my_listings' %}" class="btn action-btn w-100" style="background: linear-gradient(135deg, #db0bc0, #e21e2e); color: white;">
+                <i class="fas fa-tags"></i> My Listings
+            </a>
+        </div>
+        {% endif %}
+
+        {# --- COMMON: all roles --- #}
+        <div class="col-md-4">
+            <a href="{% url 'wallet' %}" class="btn action-btn w-100" style="background: linear-gradient(135deg, #FF9800, #FFC107); color: #0D3012;">
+                <i class="fas fa-wallet"></i> Add Funds
+            </a>
+        </div>
+        <div class="col-md-4">
+            <a href="{% url 'energy_analytics' %}" class="btn action-btn w-100" style="background: linear-gradient(135deg, #455A64, #607D8B); color: white;">
+                <i class="fas fa-chart-bar"></i> Analytics
+            </a>
+        </div>
+        <div class="col-md-4">
+            <button type="button" id="virtual-meter-btn" class="btn action-btn w-100" style="background: linear-gradient(135deg, #00BCD4, #0097A7); color: white;">
+                <i class="fas fa-broadcast-tower"></i> Start Virtual Meter
+            </button>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'profile' %}" class="btn btn-primary action-btn w-100">
+                <i class="fas fa-user-cog"></i> My Profile
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('virtual-meter-btn');
+  if (!btn) return;
+
+  let running = false;
+  let timer = null;
+  const intervalMs = 5000; // poll every 5s
+
+    function tick() {
+    return fetch('{% url "virtual_meter_tick" %}', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        // virtual_meter_tick is CSRF exempt, but sending token helps if you later enable CSRF checks.
+        'X-CSRFToken': (document.querySelector('input[name="csrfmiddlewaretoken"]') || {}).value || ''
+      },
+      // Simulate “real-world time”: advance by 15 minutes per tick.
+      // UI polls every ~5 seconds, but the meter advances every tick.
+      body: JSON.stringify({ interval_minutes: 15 })
+    }).then(async (r) => {
+      const txt = await r.text();
+      try { return JSON.parse(txt); } catch { return { success: false, error: txt }; }
+    });
+  }
+
+
+
+
+  // Show API errors directly on the page so the button becomes “visible”/debuggable
+  const dashDebug = document.getElementById('virtual-meter-debug');
+  if (dashDebug) {
+    dashDebug.textContent = 'Virtual meter idle';
+  }
+
+  // Also show network errors in the same debug box
+  function setDebug(msg) {
+    if (dashDebug) dashDebug.textContent = msg;
+  }
+
+
+
+
+
+
+  async function start() {
+    running = true;
+    setDebug('Starting virtual meter...');
+    btn.innerHTML = '<i class="fas fa-stop"></i> Stop Virtual Meter';
+
+    btn.style.background = 'linear-gradient(135deg, #EF5350, #C62828)';
+
+    // Immediately tick once
+    await tick().catch(() => {});
+
+    timer = setInterval(async () => {
+      try {
+        setDebug('Calling virtual meter tick...');
+        const res = await tick();
+        if (res && res.success) {
+          setDebug(`Tick OK. Prod=${(res.latest.production_kwh||0)} Cons=${(res.latest.consumption_kwh||0)} Net=${(res.latest.net_kwh||0)}`);
+
+
+          const latest = res.latest || {};
+          const prod = latest.production_kwh;
+          const cons = latest.consumption_kwh;
+          const net = latest.net_kwh;
+
+          const prodEl = document.getElementById('dashboard-production');
+          const consEl = document.getElementById('dashboard-consumption');
+          const netEl = document.getElementById('dashboard-net');
+
+          // Update live visual meter
+          const vmProdLive = document.getElementById('vm-prod-live');
+          const vmConsLive = document.getElementById('vm-cons-live');
+          const vmNetLive = document.getElementById('vm-net-live');
+          const vmProdBar = document.getElementById('vm-prod-bar');
+          const vmConsBar = document.getElementById('vm-cons-bar');
+          const vmTs = document.getElementById('vm-timestamp-live');
+
+          if (vmProdLive) vmProdLive.textContent = Number(prod || 0).toFixed(2);
+          if (vmConsLive) vmConsLive.textContent = Number(cons || 0).toFixed(2);
+          if (vmNetLive) {
+            const netColor = (net >= 0) ? '#1B5E20' : '#C62828';
+            vmNetLive.style.color = netColor;
+            vmNetLive.textContent = Number(net || 0).toFixed(2);
+          }
+          // Show simulated time (15 minutes per successful tick)
+          if (vmTs) {
+            try {
+              // Start from real clock at first tick, then add 15 minutes each tick.
+              // This stays consistent even if JS timers drift slightly.
+              if (!window.__vmSimStartMs) {
+                window.__vmSimStartMs = Date.now();
+                window.__vmSimTickIndex = 0;
+              } else {
+                window.__vmSimTickIndex = (window.__vmSimTickIndex || 0) + 1;
+              }
+              const simMs = window.__vmSimStartMs + (window.__vmSimTickIndex * 15 * 60 * 1000);
+              vmTs.textContent = `Simulated time: ${new Date(simMs).toLocaleTimeString()}`;
+            } catch {}
+          }
+
+
+
+          // Map values to bar heights (relative scaling; clamp 8%..100%)
+          const maxKwh = Math.max(1, (prod > cons ? prod : cons));
+          const prodPct = Math.max(0.08, Math.min(1, (prod || 0) / maxKwh));
+          const consPct = Math.max(0.08, Math.min(1, (cons || 0) / maxKwh));
+          if (vmProdBar) vmProdBar.style.height = `${Math.round(prodPct * 100)}%`;
+          if (vmConsBar) vmConsBar.style.height = `${Math.round(consPct * 100)}%`;
+
+          // These cards show cumulative totals on initial load; update them to show motion.
+          if (prodEl) prodEl.textContent = (prodEl.textContent && !isNaN(parseFloat(prodEl.textContent)))
+            ? (parseFloat(prodEl.textContent) + prod).toFixed(2)
+            : Number(prod).toFixed(2);
+
+          if (consEl) consEl.textContent = (consEl.textContent && !isNaN(parseFloat(consEl.textContent)))
+            ? (parseFloat(consEl.textContent) + cons).toFixed(2)
+            : Number(cons).toFixed(2);
+
+          if (netEl) netEl.textContent = (netEl.textContent && !isNaN(parseFloat(netEl.textContent)))
+            ? (parseFloat(netEl.textContent) + net).toFixed(2)
+            : Number(net).toFixed(2);
+
+        }
+      } catch (e) {
+        setDebug(`Tick failed: ${e}`);
+      }
+
+    }, intervalMs);
+  }
+
+  function stop() {
+    running = false;
+    if (timer) clearInterval(timer);
+    timer = null;
+    btn.innerHTML = '<i class="fas fa-broadcast-tower"></i> Start Virtual Meter';
+    btn.style.background = 'linear-gradient(135deg, #00BCD4, #0097A7)';
+  }
+
+  btn.addEventListener('click', () => {
+    if (running) stop();
+    else start();
+  });
+});
+</script>
+
+
+<!-- Location-Based Buy Recommendations Section: consumers + prosumers only -->
+{% if user.role == 'consumer' or user.role == 'prosumer' %}
+<div class="buy-recommendations-section fade-in">
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="recommendation-card card">
+                        <div class="card-header" style="background: linear-gradient(135deg, #1B5E20, #4CAF50);">
+                            <i class="fas fa-map-marker-alt"></i>Recommended Sellers Near You
+                        </div>
+                        <div class="card-body p-0">
+                            {% if buy_recommendations and buy_recommendations|length > 0 %}
+                                <!-- Market Info -->
+                                <div class="market-info" style="padding: 16px;">
+                                    <div class="market-info-item sellers">
+                                        <div class="value">{{ buy_recommendations|length }}</div>
+                                        <div class="label">Sellers Found</div>
+                                    </div>
+                                    {% if market_average_price %}
+                                    <div class="market-info-item avg-price">
+                                        <div class="value">₹{{ market_average_price }}</div>
+                                        <div class="label">Avg Price/kWh</div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div style="padding:10px; font-size:12px; color:#888;">
+    Debug → Sellers: {{ recommendation_count }} |
+    Has Location: {{ has_user_location }} |
+    Avg Price: {{ market_average_price }}
+</div>
+                                <!-- Seller Cards -->
+                                {% for rec in buy_recommendations|default:buy_recommendations|slice:":5" %}
+                                <div class="seller-card">
+                                    <div class="seller-rank 
+                                        {% if forloop.counter == 1 %}gold
+                                        {% elif forloop.counter == 2 %}silver
+                                        {% elif forloop.counter == 3 %}bronze
+                                        {% else %}default
+                                        {% endif %}">
+                                        {{ forloop.counter }}
+                                    </div>
+                                    <div class="seller-info">
+                                        <div class="seller-name">{{ rec.username }}</div>
+                                        <div class="seller-details">
+<span class="badge bg-light text-dark seller-distance">
+                                                {% if rec.distance_km is not none %}
+                                                    {{ rec.distance_km|floatformat:2 }} km {% if rec.direction %}{{ rec.direction }}{% endif %}
+                                                {% elif rec.location_name %}
+                                                    {{ rec.location_name }}
+                                                {% else %}
+                                                    --
+                                                {% endif %}
+                                            </span>
+                                        </div>
+                                        {% if rec.available_kwh %}
+                                        <div class="seller-location">
+                                            {{ rec.available_kwh|floatformat:1 }} kWh available
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="seller-price">
+                                        <div class="price-per-kwh">₹{{ rec.price_per_kwh|floatformat:2 }}/kWh</div>
+                                        <a href="{% url 'buy_energy' rec.listing_id %}" class="btn btn-sm btn-success mt-2">
+                                            <i class="fas fa-shopping-cart"></i> Buy
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                                
+                                {% if has_user_location %}
+                                <div style="padding: 12px; text-align: center; border-top: 1px solid #eee;">
+                                    <a href="{% url 'energy_marketplace' %}" class="btn btn-outline-success btn-sm">
+                                        <i class="fas fa-search me-1"></i> View All Sellers
+                                    </a>
+                                </div>
+                                {% endif %}
+                            {% else %}
+                            <div class="no-location-msg">
+    <i class="fas fa-map-marked-alt"></i>
+
+    {% if not has_user_location %}
+        <p><strong>Location not set</strong></p>
+        <p>Update your <a href="{% url 'profile' %}">profile</a> to get nearby seller recommendations</p>
+    {% elif recommendation_count == 0 %}
+        <p><strong>No nearby sellers found</strong></p>
+        <a href="{% url 'energy_marketplace' %}" class="btn btn-success mt-2">
+            Browse All Listings
+        </a>
+    {% else %}
+        <p>No recommendations available</p>
+    {% endif %}
+</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endif %}
+        <!-- Weather and Maintenance Section -->
+        <div class="row g-4 mb-4">
+            <!-- Panel Status -->
+            <div class="col-12">
+                <div class="panel-status">
+                    <div class="panel-status-item age">
+                        <div class="value">{% if panel_age %}{{ panel_age }} yrs{% else %}--{% endif %}</div>
+                        <div class="label">Panel Age</div>
+                    </div>
+                    <div class="panel-status-item efficiency">
+                        <div class="value">{{ panel_efficiency }}%</div>
+                        <div class="label">Efficiency</div>
+                    </div>
+                    <div class="panel-status-item {% if needs_maintenance %}warning{% else %}maintenance{% endif %}">
+                        <div class="value">{% if needs_maintenance %}<i class="fas fa-exclamation-triangle"></i>{% else %}<i class="fas fa-check"></i>{% endif %}</div>
+                        <div class="label">{% if needs_maintenance %}Maintenance Needed{% else %}Up to Date{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <!-- Weather Forecast -->
+            <div class="col-md-6">
+                <div class="weather-card card">
+                    <div class="card-header">
+                        <i class="fas fa-cloud-sun"></i>7-Day Weather Forecast
+                    </div>
+                    <div class="card-body p-0">
+                        {% if weather_forecast %}
+                            {% for day in weather_forecast|slice:":7" %}
+                            <div class="weather-forecast-item">
+                                <div class="day">{{ day.day_of_week|slice:":3" }}</div>
+                                <div class="temp">
+                                    <i class="fas fa-sun text-warning"></i>
+                                    {{ day.sunshine_hours }}h
+                                </div>
+                                <div class="temp">
+                                    <span>{{ day.max_temperature }}°</span> / {{ day.min_temperature }}°
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-cloud"></i>
+                            <p>Weather data unavailable</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance Suggestions -->
+            <div class="col-md-6">
+                <div class="maintenance-card card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #FF9800, #FFB74D);">
+                        <i class="fas fa-tools"></i>Maintenance Suggestions
+                    </div>
+                    <div class="card-body p-0">
+                        {% if maintenance_suggestions %}
+                            {% for suggestion in maintenance_suggestions %}
+                            <div class="suggestion-item">
+                                <div class="suggestion-icon {{ suggestion.type }}">
+                                    <i class="fas {{ suggestion.icon|default:'fa-info-circle' }}"></i>
+                                </div>
+                                <div class="suggestion-content">
+                                    <div class="suggestion-title">{{ suggestion.title }}</div>
+                                    <div class="suggestion-message">{{ suggestion.message }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-check-circle"></i>
+                            <p>No maintenance suggestions at this time</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Alerts -->
+        {% if weather_alerts %}
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #1565C0, #42A5F5);">
+                        <i class="fas fa-bell me-2"></i>Weather Alerts
+                    </div>
+                    <div class="card-body">
+                        {% for alert in weather_alerts %}
+                        <div class="alert alert-{% if alert.type == 'warning' %}warning{% else %}info{% endif %} d-flex align-items-center mb-2">
+                            <i class="fas {% if alert.type == 'warning' %}fa-exclamation-triangle{% else %}fa-info-circle{% endif %} me-2"></i>
+                            <div><strong>{{ alert.date }}</strong>: {{ alert.message }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Temperature-based Solar Suggestions (Dedicated) -->
+        <div class="row g-4 mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #F57C00, #FFB74D);">
+                        <i class="fas fa-thermometer-half me-2"></i>Temperature-based Solar Suggestions
+                    </div>
+                    <div class="card-body">
+                        {% if temperature_alerts %}
+                            {% for alert in temperature_alerts %}
+                            <div class="alert d-flex align-items-start mb-2
+                                {% if alert.priority == 'high' %}alert-danger
+                                {% elif alert.priority == 'medium' %}alert-warning
+                                {% else %}alert-info{% endif %}">
+                                <i class="fas
+                                    {% if alert.priority == 'high' %}fa-thermometer-full
+                                    {% elif alert.priority == 'medium' %}fa-thermometer-half
+                                    {% else %}fa-thermometer-quarter{% endif %} me-2 mt-1"></i>
+                                <div>
+                                    <strong>
+                                        {% if alert.priority == 'high' %}⚠ High Temperature Alert
+                                        {% elif alert.priority == 'medium' %}Solar Panel Temperature Advisory
+                                        {% else %}Temperature Notice{% endif %}
+                                    </strong>
+                                    <div class="small mt-1">{{ alert.message }}</div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-state" style="padding: 18px 0;">
+                                <i class="fas fa-thermometer-quarter" style="font-size: 2.2rem; opacity: 0.35;"></i>
+                                <p style="margin:0;">No temperature-based suggestions right now.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Main Content -->
+        <div class="content-grid" >
+            <!-- Left Column -->
+            <div class="left-column">
+                <!-- Recent Activity -->
+                <div class="card activity-card">
+                    <div class="card-header">
+                        <ul class="nav nav-tabs card-header-tabs" id="activityTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active" id="production-tab" data-bs-toggle="tab" data-bs-target="#production" type="button">
+                                    <i class="fas fa-solar-panel me-2"></i>Production
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link" id="consumption-tab" data-bs-toggle="tab" data-bs-target="#consumption" type="button">
+                                    <i class="fas fa-bolt me-2"></i>Consumption
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="activityTabsContent">
+                            <div class="tab-pane fade show active" id="production" role="tabpanel">
+                                {% if recent_productions %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="fas fa-calendar me-2"></i>Date</th>
+                                                <th><i class="fas fa-bolt me-2"></i>Energy (kWh)</th>
+                                                <th><i class="fas fa-panel me-2"></i>Panel ID</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for production in recent_productions %}
+                                            <tr>
+                                                <td>{{ production.timestamp|date:"M d, Y H:i" }}</td>
+                                                <td><span class="badge bg-success">{{ production.energy_kwh }}</span></td>
+                                                <td>{{ production.panel_id|default:"-" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-solar-panel"></i>
+                                    <p>No production data yet. <a href="{% url 'add_production' %}">Add production</a></p>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="tab-pane fade" id="consumption" role="tabpanel">
+                                {% if recent_consumptions %}
+                                <div class="table-responsive">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th><i class="fas fa-calendar me-2"></i>Date</th>
+                                                <th><i class="fas fa-bolt me-2"></i>Energy (kWh)</th>
+                                                <th><i class="fas fa-device me-2"></i>Device</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for consumption in recent_consumptions %}
+                                            <tr>
+                                                <td>{{ consumption.timestamp|date:"M d, Y H:i" }}</td>
+                                                <td><span class="badge" style="background: linear-gradient(135deg, #FF9800, #FFC107); color: #0D3012;">{{ consumption.consumption_kwh }}</span></td>
+                                                <td>{{ consumption.device_name|default:"-" }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-bolt"></i>
+                                    <p>No consumption data yet.</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Active Listings -->
+                {% if active_listings %}
+                <div class="card sidebar-card">
+                    <div class="card-header bg-success text-white">
+                        <i class="fas fa-tags"></i>Your Active Listings
+                    </div>
+                    <div class="card-body">
+                        {% for listing in active_listings %}
+                        <div class="listing-item">
+                            <span><strong>{{ listing.available_kwh|floatformat:2 }}</strong> kWh</span>
+                            <span class="badge bg-primary">₹{{ listing.price_per_kwh }}/kWh</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Recent Transactions -->
+                <div class="card sidebar-card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="fas fa-exchange-alt"></i>Recent Transactions
+                    </div>
+                    <div class="card-body">
+                        {% if sold_transactions or bought_transactions %}
+                            {% for transaction in sold_transactions|slice:":3" %}
+                            <div class="transaction-item">
+                                <div>
+                                    <small class="text-muted">Sold</small>
+                                    <div>{{ transaction.energy_kwh }} kWh</div>
+                                </div>
+                                <span class="badge bg-success">+₹{{ transaction.total_price }}</span>
+                            </div>
+                            {% endfor %}
+                            {% for transaction in bought_transactions|slice:":3" %}
+                            <div class="transaction-item">
+                                <div>
+                                    <small class="text-muted">Bought</small>
+                                    <div>{{ transaction.energy_kwh }} kWh</div>
+                                </div>
+                                <span class="badge bg-danger">-₹{{ transaction.total_price }}</span>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                        <div class="empty-state">
+                            <i class="fas fa-receipt"></i>
+                            <p>No transactions yet</p>
+                        </div>
+                        {% endif %}
+                        <a href="{% url 'transaction_history' %}" class="btn btn-sm btn-outline-primary w-100 mt-3">
+                            <i class="fas fa-eye me-1"></i> View All
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="card sidebar-card">
+                    <div class="card-header" style="background: linear-gradient(135deg, #E8F5E9, #C8E6C9);">
+                        <i class="fas fa-link" style="color: #1B5E20;"></i>Quick Links
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="list-group quick-links">
+                            <a href="{% url 'energy_marketplace' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-shopping-cart"></i> Browse Marketplace
+                            </a>
+                            <a href="{% url 'wallet' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-wallet"></i> Manage Wallet
+                            </a>
+                            <a href="{% url 'profile' %}" class="list-group-item list-group-item-action">
+                                <i class="fas fa-user"></i> My Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
